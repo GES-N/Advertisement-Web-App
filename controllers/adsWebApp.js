@@ -1,6 +1,6 @@
 import Product from "../models/adsWebApp.js";
 
-// 📌 Create a Product (Only for Vendors)
+// Create a Product (Only for Vendors)
 export const createProduct = async (req, res) => {
   try {
     if (req.user.role !== "vendor") {
@@ -33,7 +33,7 @@ export const createProduct = async (req, res) => {
   }
 };
 
-// 📌 Get All Products
+// Get All Products
 export const getProducts = async (req, res) => {
   try {
     const { filter = "{}", sort = "{}" } = req.query;
@@ -44,7 +44,7 @@ export const getProducts = async (req, res) => {
   }
 };
 
-// 📌 Get a Single Product by ID
+// Get a Single Product by ID
 export const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -56,7 +56,7 @@ export const getProductById = async (req, res) => {
   }
 };
 
-// 📌 Update a Product (Only for Vendors)
+// Update a Product (Only for Vendors)
 export const updateProduct = async (req, res) => {
   try {
     if (req.user.role !== "vendor") {
@@ -72,7 +72,7 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-// 📌 Delete a Product (Only for Vendors)
+// Delete a Product (Only for Vendors)
 export const deleteProduct = async (req, res) => {
   try {
     if (req.user.role !== "vendor") {
