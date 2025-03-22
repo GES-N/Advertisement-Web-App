@@ -1,5 +1,6 @@
 import {expressjwt} from 'express-jwt';
-import { UserModel } from '../models/user.js';
+import { userModel } from '../models/userModels.js';
+
 
 
 //authentication
@@ -11,7 +12,7 @@ export const isAuthenticated = expressjwt({
 //authorization
 export const isAuthorized = (roles) => {
     return async (req, res, next) => {
-        const user = await UserModel.findById(req.auth._id);
+        const user = await userModel.findById(req.auth._id);
         if(roles?.includes(user.role)) {
             next();
         }else {

@@ -1,5 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose';
+import adsRouter from './routes/adsWebApp.js';
+import userRouter from './routes/userAdsWebApp.js';
 
 const app = express();
 
@@ -11,7 +13,9 @@ const db = await mongoose.connect(process.env.MONGO_URI).then(()=>{
 })
 
 //global middleware
-//app.use(express.json())
+app.use(express.json());
+app.use(adsRouter);
+app.use(userRouter);
 
 app.listen(port, ()=>{
     console.log(`Server is running on port: ${port}.`)
