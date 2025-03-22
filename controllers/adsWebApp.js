@@ -1,5 +1,6 @@
 import Product from "../models/adsWebApp.js";
 
+
 // Create an Advert (Only for Vendors)
 export const addAdvert = async (req, res) => {
   try {
@@ -33,6 +34,7 @@ export const addAdvert = async (req, res) => {
   }
 };
 
+
 //  Get all Adverts
 export const getAllAdverts = async (req, res) => {
   try {
@@ -43,6 +45,7 @@ export const getAllAdverts = async (req, res) => {
     res.status(500).json({ message: "Error fetching products", error: error.message });
   }
 };
+
 
 // Get an Advert by ID
 export const getAdvert= async (req, res) => {
@@ -71,6 +74,7 @@ export const updateAdvert = async (req, res) => {
     res.status(500).json({ message: "Error updating product", error: error.message });
   }
 };
+
 
 // Delete an Advert (Only for Vendors)
 export const deleteAdvert = async (req, res) => {

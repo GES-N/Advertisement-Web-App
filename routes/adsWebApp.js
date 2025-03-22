@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
   addAdvert,
   deleteAdvert,
@@ -41,3 +42,4 @@ adsRouter.patch("/ads/:id", isAuthenticated, updateAdvert);
 adsRouter.patch("/ads/:id", isAuthenticated, deleteAdvert);
 
 export default adsRouter;
+
