@@ -1,7 +1,8 @@
 import Product from "../models/adsWebApp.js";
 
-// Create a Product (Only for Vendors)
-export const createProduct = async (req, res) => {
+
+// Create an Advert (Only for Vendors)
+export const addAdvert = async (req, res) => {
   try {
     if (req.user.role !== "vendor") {
       return res.status(403).json({ message: "Access denied. Vendors only." });
@@ -33,8 +34,9 @@ export const createProduct = async (req, res) => {
   }
 };
 
-// Get All Products
-export const getProducts = async (req, res) => {
+
+//  Get all Adverts
+export const getAllAdverts = async (req, res) => {
   try {
     const { filter = "{}", sort = "{}" } = req.query;
     const products = await Product.find(JSON.parse(filter)).sort(JSON.parse(sort));
@@ -44,8 +46,9 @@ export const getProducts = async (req, res) => {
   }
 };
 
-// Get a Single Product by ID
-export const getProductById = async (req, res) => {
+
+// Get an Advert by ID
+export const getAdvert= async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
@@ -56,8 +59,8 @@ export const getProductById = async (req, res) => {
   }
 };
 
-// Update a Product (Only for Vendors)
-export const updateProduct = async (req, res) => {
+// Update an Advert (Only for Vendors)
+export const updateAdvert = async (req, res) => {
   try {
     if (req.user.role !== "vendor") {
       return res.status(403).json({ message: "Access denied. Vendors only." });
@@ -72,8 +75,9 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-// Delete a Product (Only for Vendors)
-export const deleteProduct = async (req, res) => {
+
+// Delete an Advert (Only for Vendors)
+export const deleteAdvert = async (req, res) => {
   try {
     if (req.user.role !== "vendor") {
       return res.status(403).json({ message: "Access denied. Vendors only." });

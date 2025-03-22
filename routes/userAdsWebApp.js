@@ -1,5 +1,7 @@
 import { Router } from "express";
-import { loginUser, registerUser } from "../controllers/userAdsWebController.js";
+
+import { loginUser, registerUser } from "../controllers/userAdsWebApp.js";
+
 import { isAuthenticated, isAuthorized } from "../middlewares/userAuth.js";
 
 const userRouter = Router()
