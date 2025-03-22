@@ -16,4 +16,4 @@ const userSchema = new Schema({
 });
 
 userSchema.plugin(normalize);
-export const UserModel = model("User", userSchema);
+export const userModel = model("User", userSchema);

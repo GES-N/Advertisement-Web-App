@@ -1,7 +1,8 @@
-import { UserModel } from "../models/userModels.js";
+import { userModel } from "../models/userModels.js";
 import { loginUserValidator, registerUserValidator } from "../validators/userAdsWebApp.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+
 
 //validate user info
 export const registerUser = async(req,res,next)=>{
@@ -11,7 +12,7 @@ export const registerUser = async(req,res,next)=>{
     }
 
 //check if user exists
-const user = UserModel.findOne({
+const user = userModel.findOne({
     $or:[
         {username: value.username},
         {email: value.email}
@@ -43,7 +44,7 @@ if (error){
 
 //find matching user record in database
 
-const user = UserModel.findOne({
+const user = userModel.findOne({
     $or:[
         {username:value.name},
         {email:value.email}
