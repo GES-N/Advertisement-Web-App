@@ -3,9 +3,9 @@ import { Router } from "express";
 import {
   addAdvert,
   deleteAdvert,
-  getAdvert,
+  getAdvertById,
   getAllAdverts,
-  updateAdvert,
+  updateAdvert
 } from "../controllers/adsWebApp.js";
 import { isAuthenticated, isAuthorized } from "../middlewares/userAuth.js";
 import { adsImageUpload } from "../middlewares/upload.js";
@@ -16,9 +16,9 @@ export const adsRouter = Router();
 adsRouter.post(
   "/ads",
   isAuthenticated,
-  isAuthorized(["superadmin", "admin"]),
+  isAuthorized(["vendor"]),
   // productImageUpload.single('image'),
-  adsImageUpload.array("pictures", 3),
+  adsImageUpload.array("images", 3),
   addAdvert
 );
 
@@ -26,20 +26,20 @@ adsRouter.post(
 adsRouter.get("/ads", getAllAdverts);
 
 //get an ad
-adsRouter.get("/ads/:id", getAdvert);
+adsRouter.get("/ads/:id", getAdvertById);
 
 //update an ad
-adsRouter.patch("/ads/:id", isAuthenticated, updateAdvert);
+adsRouter.patch("/ads/:id", isAuthenticated, isAuthorized(["vendor"]), updateAdvert);
 
 //incase of attempting a put rather than a patch
 // adsRouter.put(
 //     '/products/:id',
-//     isAuthenticated,
+//     isAuthenticated, 
 //     productImageUpload.array('pictures', 3),
 //     updateAdvert);
 
 //delete an ad
-adsRouter.patch("/ads/:id", isAuthenticated, deleteAdvert);
+adsRouter.delete("/ads/:id", isAuthenticated, deleteAdvert);
 
 export default adsRouter;
 

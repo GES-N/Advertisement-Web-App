@@ -8,24 +8,17 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res, next) => {
-  //validate user
   const { error, value } = registerUserValidator.validate(req.body);
   if (error) {
     return res.status(422).json(error);
   }
-
-  //check if user already exists
   const user = await userModel.findOne({
     $or: [{ username: value.username }, { email: value.email }],
   });
   if (user) {
     res.status(409).json("User already exist");
   }
-
-  //hashing password
-  const hashedPassword = await bcrypt.hashSync(value.password, 10);
-
-  //creating the user record in database
+  const hashedPassword = bcrypt.hashSync(value.password, 10);
   const newUser = await userModel.create({
     ...value,
     password: hashedPassword,

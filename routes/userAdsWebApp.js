@@ -13,12 +13,12 @@ userRouter.post('/user/register', registerUser);
 userRouter.post('/user/login', loginUser);
 
 //update user
-userRouter.post('/user/:id', updateUser);
+// userRouter.put('/user/:id', updateUser);
 
-// //update user
-// userRouter.put('/user/:id', 
-//     isAuthenticated,
-//     isAuthorized(['superadmin', 'admin']),
-//     updateUser);
+//update user
+userRouter.put('/user/:id', 
+    isAuthenticated,
+    isAuthorized(['vendor', 'admin']),
+    updateUser);
 
 export default userRouter;

@@ -1,93 +1,88 @@
-import Product from "../models/adsWebApp.js";
 
+import { ProductModel } from "../models/adsWebApp.js";
+import { validateProduct, validateProductUpdate } from "../validators/adsWebApp.js";
 
-// Create an Advert (Only for Vendors)
-export const addAdvert = async (req, res) => {
+//Add new advert
+export const addAdvert = async (req, res, next) => {
   try {
-    if (req.user.role !== "vendor") {
-      return res.status(403).json({ message: "Access denied. Vendors only." });
-    }
-
-    const { productName, description, price, category, stockQuantity } = req.body;
-    const images = req.files?.map(file => file.path) || [];
-
-    // Validate required fields
-    if (!productName || !description || !price || !category || !stockQuantity) {
-      return res.status(400).json({ message: "All fields are required." });
-    }
-
-    // Create product
-    const product = await Product.create({
-      vendor: req.user.id,
-      productName,
-      description,
-      price,
-      category,
-      images,
-      stockQuantity,
-      availabilityStatus: stockQuantity > 0,
+   
+    const { error, value } = validateProduct.validate({
+      ...req.body,
+      images: req.files?.map((file)=>{
+        return file.filename;
+      }),
     });
-
-    res.status(201).json({ message: "Product created successfully", product });
-  } catch (error) {
-    res.status(500).json({ message: "Error creating product", error: error.message });
-  }
-};
-
-
-//  Get all Adverts
-export const getAllAdverts = async (req, res) => {
-  try {
-    const { filter = "{}", sort = "{}" } = req.query;
-    const products = await Product.find(JSON.parse(filter)).sort(JSON.parse(sort));
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching products", error: error.message });
-  }
-};
-
-
-// Get an Advert by ID
-export const getAdvert= async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
-
-    res.json(product);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching product", error: error.message });
-  }
-};
-
-// Update an Advert (Only for Vendors)
-export const updateAdvert = async (req, res) => {
-  try {
-    if (req.user.role !== "vendor") {
-      return res.status(403).json({ message: "Access denied. Vendors only." });
+    if (error) {
+      return res.status(422).json(error);
     }
-
-    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedProduct) return res.status(404).json({ message: "Product not found" });
-
-    res.json({ message: "Product updated successfully", updatedProduct });
+    const product = await ProductModel.create({
+      ...value,  
+     vendor: req.auth.id
+  });
+    console.log(product)
+    res.status(201).json({ message: "Advert Added" });
+   
   } catch (error) {
-    res.status(500).json({ message: "Error updating product", error: error.message });
+    // console.log(error instanceof 'MongooseError')
+    if (error.code === 11000) {
+      return response.status(409).json(error.message);
+    }
+    next(error);
+}
+};
+  
+
+
+//Fetch All Adverts
+export const getAllAdverts = async (req, res, next) => {
+  try {
+    const getAds = await ProductModel.find();
+    res.status(200).json(getAds);
+  } catch (error) {
+    next(error);
   }
 };
 
-
-// Delete an Advert (Only for Vendors)
-export const deleteAdvert = async (req, res) => {
+//Get advert by id
+export const getAdvertById = async (req, res, next) => {
   try {
-    if (req.user.role !== "vendor") {
-      return res.status(403).json({ message: "Access denied. Vendors only." });
+    const advert = await ProductModel.findById(req.params.id);
+    if (advert) {
+      res.status(200).json(advert);
+    } else {
+      res.status(404).json({ message: "Advert not found" });
     }
-
-    const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
-
-    res.json({ message: "Product deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting product", error: error.message });
+    next(error);
   }
+};
+
+//Update an advert
+export const updateAdvert = async (req, res, next) => {
+ const { error } = validateProductUpdate.validate(req.body);
+ if (error) {
+     return res.status(400).json({ message: error.details[0].message });
+ }
+
+ const id =  req.params.id 
+ console.log("Id", id)
+const results = await ProductModel.findByIdAndUpdate( id, req.body,{ new: true }
+ );
+ // Return a response
+ if (!results) {
+     return res.status(404).json({ message: "Advert not found" });
+ }
+ res.status(200).json({ results });
+};
+
+
+//Delete an Advert
+export const deleteAdvert = async (req, res, next) => {
+  const delAd = await ProductModel.findByIdAndDelete({
+    id: req.params.id,
+  });
+  if (!delAd) {
+    return res.status(404).json({ message: "Advert not found" });
+  }
+  res.json({ message: "Advert removed" });
 };
