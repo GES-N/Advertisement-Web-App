@@ -6,11 +6,11 @@ export const registerUserValidator = Joi.object({
     password : Joi.string().required(),
     role: Joi.string().required(),
     confirmPassword : Joi.ref('password'),
-    website: Joi.string(),
-    phone: Joi.string(),
-    contactName:Joi.string(),
-    businessAddress: Joi.string(),
-    uploadLogo:Joi.string(),
+    website: Joi.string().optional(),
+    phone: Joi.string().optional(),
+    contactName:Joi.string().optional(),
+    businessAddress: Joi.string().optional(),
+    uploadLogo:Joi.string().optional(),
 
 }).with('password', 'confirmPassword');
 
