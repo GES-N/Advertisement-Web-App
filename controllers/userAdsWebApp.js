@@ -8,39 +8,43 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res, next) => {
-  const { error, value } = registerUserValidator.validate({
-    ...req.body,
-    uploadLogo: req.file?.filename
-  });
-  if (error) {
-    return res.status(422).json(error);
+  try {
+    const { error, value } = registerUserValidator.validate({
+      ...req.body,
+      uploadLogo: req.file?.filename
+    });
+    if (error) {
+      return res.status(422).json(error);
+    }
+    const user = await userModel.findOne({
+      $or: [{ username: value.username }, { email: value.email }],
+    });
+    if (user) {
+      res.status(409).json("User already exist");
+    }
+    const hashedPassword = bcrypt.hashSync(value.password, 10);
+    const newUser = await userModel.create({
+      ...value,
+      password: hashedPassword,
+    });
+  
+    //send confirmation mail to the user
+    const sendWelcomeEmail = await sendEmail(
+      newUser.email,
+      "Welcome To Notes",
+      `Hello ${newUser.username} You are welcome`
+    );
+  
+    return res.status(201).json({
+      message: "user created successfully",
+      data: newUser,
+    });
+    //return response
+  }catch(error){
+    next(error)
   }
-  const user = await userModel.findOne({
-    $or: [{ username: value.username }, { email: value.email }],
-  });
-  if (user) {
-    res.status(409).json("User already exist");
-  }
-  const hashedPassword = bcrypt.hashSync(value.password, 10);
-  const newUser = await userModel.create({
-    ...value,
-    password: hashedPassword,
-  });
-
-  //send confirmation mail to the user
-  const sendWelcomeEmail = await sendEmail(
-    newUser.email,
-    "Welcome To Notes",
-    `Hello ${newUser.username} You are welcome`
-  );
-
-  return res.status(201).json({
-    message: "user created successfully",
-    data: newUser,
-  });
-  //return response
- 
-};
+  };
+  
 
 export const loginUser = async (req, res, next) => {
   const { error, value } = loginUserValidator.validate(req.body);
