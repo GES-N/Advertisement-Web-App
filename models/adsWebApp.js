@@ -1,4 +1,5 @@
 import mongoose, { model } from "mongoose";
+import normalize from "normalize-mongoose";
 
 const productSchema = new mongoose.Schema(
   {
@@ -41,4 +42,5 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+productSchema.plugin(normalize);
 export const ProductModel = model("Product", productSchema);

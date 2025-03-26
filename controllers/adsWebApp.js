@@ -36,11 +36,9 @@ export const addAdvert = async (req, res, next) => {
 //Fetch All Adverts
 export const getAllAdverts = async (req, res, next) => {
   try {
-    const {filter="{}",sort="{}"}=req.query;
-  
+    const { filter = "{}"} = req.query;
     const result = await ProductModel
-    .find(JSON.parse(filter))
-    .sort(JSON.parse(sort));
+    .find(JSON.parse(filter));
   
     return res.status(200).json(result);
   } catch (error) {
