@@ -8,7 +8,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res, next) => {
-  const { error, value } = registerUserValidator.validate(req.body);
+  const { error, value } = registerUserValidator.validate({
+    ...req.body,
+    uploadLogo: req.file?.filename
+  });
   if (error) {
     return res.status(422).json(error);
   }
