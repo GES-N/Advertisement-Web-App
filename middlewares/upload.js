@@ -1,7 +1,4 @@
-
 import multer from "multer";
-import { multerSaveFilesOrg } from "multer-savefilesorg"; 
-//using multer-storage-cloudinary instead of savefiles.org
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 
@@ -20,8 +17,6 @@ export const adsImageUpload = multer({
       }
     }),
   });
-
-
 
   export const  uploadLogo = multer ({
     storage: new CloudinaryStorage({

@@ -2,10 +2,8 @@
 import { ProductModel } from "../models/adsWebApp.js";
 import { validateProduct, validateProductUpdate } from "../validators/adsWebApp.js";
 
-//Add new advert
 export const addAdvert = async (req, res, next) => {
   try {
-
     const { error, value } = validateProduct.validate({
       ...req.body,
       images: req.files?.map((file) => {
@@ -23,7 +21,6 @@ export const addAdvert = async (req, res, next) => {
     res.status(201).json({ message: "Advert Added" });
 
   } catch (error) {
-    // console.log(error instanceof 'MongooseError')
     if (error.code === 11000) {
       return response.status(409).json(error.message);
     }
@@ -45,12 +42,6 @@ export const getAllAdverts = async (req, res, next) => {
     next(error);
     
   }
-  // try {
-  //   const getAds = await ProductModel.find();
-  //   res.status(200).json(getAds);
-  // } catch (error) {
-  //   next(error);
-  // }
 };
 
 //Get advert by id
@@ -74,12 +65,9 @@ export const updateAdvert = async (req, res, next) => {
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
-
     const id = req.params.id
-    console.log("Id", id)
     const results = await ProductModel.findByIdAndUpdate(id, req.body, { new: true }
     );
-    // Return a response
     if (!results) {
       return res.status(404).json({ message: "Advert not found" });
     }

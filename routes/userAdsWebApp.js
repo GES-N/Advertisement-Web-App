@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { uploadLogo } from "../middlewares/upload.js";
 
-import { loginUser, registerUser, updateUser } from "../controllers/userAdsWebApp.js";
+import { getAuthenticatedUser, loginUser, registerUser, updateUser } from "../controllers/userAdsWebApp.js";
 
 import { isAuthenticated, isAuthorized } from "../middlewares/userAuth.js";
 
@@ -14,12 +14,12 @@ userRouter.post('/user/register',  uploadLogo.single("uploadLogo"), registerUser
 userRouter.post('/user/login', loginUser);
 
 //update user
-// userRouter.put('/user/:id', updateUser);
-
-//update user
 userRouter.put('/user/:id', 
     isAuthenticated,
     isAuthorized(['vendor', 'admin']),
     updateUser);
+
+
+ userRouter.get('/user/me', isAuthenticated, getAuthenticatedUser )
 
 export default userRouter;

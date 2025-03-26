@@ -3,6 +3,7 @@ import { sendEmail } from "../utils/mailing.js";
 import {
   loginUserValidator,
   registerUserValidator,
+  updateUserValidator,
 } from "../validators/userAdsWebApp.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -11,7 +12,7 @@ export const registerUser = async (req, res, next) => {
   try {
     const { error, value } = registerUserValidator.validate({
       ...req.body,
-      uploadLogo: req.file?.filename
+      uploadLogo: req.file?.filename,
     });
     if (error) {
       return res.status(422).json(error);
@@ -27,75 +28,63 @@ export const registerUser = async (req, res, next) => {
       ...value,
       password: hashedPassword,
     });
-  
-    //send confirmation mail to the user
     const sendWelcomeEmail = await sendEmail(
       newUser.email,
       "Welcome To Notes",
       `Hello ${newUser.username} You are welcome`
     );
-  
     return res.status(201).json({
       message: "user created successfully",
       data: newUser,
     });
-    //return response
-  }catch(error){
-    next(error)
+  } catch (error) {
+    next(error);
   }
-  };
-  
+};
 
 export const loginUser = async (req, res, next) => {
   const { error, value } = loginUserValidator.validate(req.body);
   if (error) {
     return res.status(422).json(error);
   }
-
-  //check if user exists in the database
-  const user = await userModel.findOne({email: value.email});
-
-console.log("username", user )
-
+  const user = await userModel.findOne({ email: value.email });
   if (user) {
-    console.log(user)
-  
-  
-
-  //compare incoming password with existing password
-
-  const comparePassword = bcrypt.compareSync(value.password, user.password);
-  if (!comparePassword) {
-    return res.status(401).json("Invalid credentials!");
+    console.log(user);
+    const comparePassword = bcrypt.compareSync(value.password, user.password);
+    if (!comparePassword) {
+      return res.status(401).json("Invalid credentials!");
+    }
+    const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "24h",
+    });
+    return res.status(200).json({
+      id: user.id,
+      role: user.role,
+      accessToken,
+    });
+  } else {
+    res.send("user does not exist");
   }
-
-  //generate access token
-  const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: "24h",
-  });
-  //Return Response
-  return res.status(200).json({ accessToken });
-} else {
-  res.send("user does not exist")
-}
 };
 
 export const updateUser = async (req, res, next) => {
-  //Validate request body
   const { error, value } = updateUserValidator.validate(req.body);
-
   if (error) {
     return res.status(422).json(error);
   }
-
-  //update user in database
-
-  const result = await userModel.findByIdAndUpdate(
-    // req.auth.id,
-    req.params.id,
-    value,
-    { new: true }
-  );
-  //return response
+  const result = await userModel.findByIdAndUpdate(req.params.id, value, {
+    new: true,
+  });
   res.status(200).json(result);
+};
+
+export const getAuthenticatedUser = async (req, res, next) => {
+  try {
+    const result = await userModel
+      .findById(req.auth.id)
+      .select({ password: false });
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
 };
