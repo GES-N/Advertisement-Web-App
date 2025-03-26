@@ -11,11 +11,10 @@ const userSchema = new Schema({
   businessAddress: { type: String },
   uploadLogo: { type: String },
 
-
   role: {
     type: String,
     default: "user",
-    enum: ["user", "vendor"],
+    enum: ["user", "vendor", "admin"]
   },
 });
 
