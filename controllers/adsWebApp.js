@@ -5,10 +5,10 @@ import { validateProduct, validateProductUpdate } from "../validators/adsWebApp.
 //Add new advert
 export const addAdvert = async (req, res, next) => {
   try {
-   
+
     const { error, value } = validateProduct.validate({
       ...req.body,
-      images: req.files?.map((file)=>{
+      images: req.files?.map((file) => {
         return file.filename;
       }),
     });
@@ -16,21 +16,21 @@ export const addAdvert = async (req, res, next) => {
       return res.status(422).json(error);
     }
     const product = await ProductModel.create({
-      ...value,  
-     vendor: req.auth.id
-  });
+      ...value,
+      vendor: req.auth.id
+    });
     console.log(product)
     res.status(201).json({ message: "Advert Added" });
-   
+
   } catch (error) {
     // console.log(error instanceof 'MongooseError')
     if (error.code === 11000) {
       return response.status(409).json(error.message);
     }
     next(error);
-}
+  }
 };
-  
+
 
 
 //Fetch All Adverts
@@ -59,30 +59,36 @@ export const getAdvertById = async (req, res, next) => {
 
 //Update an advert
 export const updateAdvert = async (req, res, next) => {
- const { error } = validateProductUpdate.validate(req.body);
- if (error) {
-     return res.status(400).json({ message: error.details[0].message });
- }
+  try {
+    const { error } = validateProductUpdate.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
- const id =  req.params.id 
- console.log("Id", id)
-const results = await ProductModel.findByIdAndUpdate( id, req.body,{ new: true }
- );
- // Return a response
- if (!results) {
-     return res.status(404).json({ message: "Advert not found" });
- }
- res.status(200).json({ results });
+    const id = req.params.id
+    console.log("Id", id)
+    const results = await ProductModel.findByIdAndUpdate(id, req.body, { new: true }
+    );
+    // Return a response
+    if (!results) {
+      return res.status(404).json({ message: "Advert not found" });
+    }
+    res.status(200).json({ results });
+  } catch (error) {
+    next(error);
+  }
 };
 
 
 //Delete an Advert
 export const deleteAdvert = async (req, res, next) => {
-  const delAd = await ProductModel.findByIdAndDelete({
-    id: req.params.id,
-  });
-  if (!delAd) {
-    return res.status(404).json({ message: "Advert not found" });
+  try {
+    const delAd = await ProductModel.findByIdAndDelete(req.params.id);
+    if (!delAd) {
+      return res.status(404).json({ message: "Advert not found" });
+    }
+    res.json({ message: "Advert removed" });
+  } catch (error) {
+    next(error);
   }
-  res.json({ message: "Advert removed" });
 };
