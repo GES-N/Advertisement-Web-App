@@ -1,4 +1,3 @@
-import { optional } from "joi";
 import { Schema, model } from "mongoose";
 import normalize from "normalize-mongoose";
 
@@ -8,9 +7,9 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   website: { type: String },
   phone: { type: String },
-  contactName:{ type: String, optional },
+  contactName: { type: String },
   businessAddress: { type: String },
-  uploadLogo:{ type: String },
+  uploadLogo: { type: String },
 
 
   role: {
