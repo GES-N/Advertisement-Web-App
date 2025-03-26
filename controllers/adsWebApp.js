@@ -36,11 +36,23 @@ export const addAdvert = async (req, res, next) => {
 //Fetch All Adverts
 export const getAllAdverts = async (req, res, next) => {
   try {
-    const getAds = await ProductModel.find();
-    res.status(200).json(getAds);
+    const {filter="{}",sort="{}"}=req.query;
+  
+    const result = await ProductModel
+    .find(JSON.parse(filter))
+    .sort(JSON.parse(sort));
+  
+    return res.status(200).json(result);
   } catch (error) {
     next(error);
+    
   }
+  // try {
+  //   const getAds = await ProductModel.find();
+  //   res.status(200).json(getAds);
+  // } catch (error) {
+  //   next(error);
+  // }
 };
 
 //Get advert by id
