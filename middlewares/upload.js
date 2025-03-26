@@ -23,6 +23,11 @@ export const adsImageUpload = multer({
 
 
 
-  
-
-
+  export const  uploadLogo = multer ({
+    storage: new CloudinaryStorage({
+      cloudinary,
+      params: {
+        folder: "adsWebApp-api/ads-uploadLogo",
+      }
+    }),
+  })
