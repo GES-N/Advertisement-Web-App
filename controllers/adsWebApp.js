@@ -1,6 +1,8 @@
-
 import { ProductModel } from "../models/adsWebApp.js";
-import { validateProduct, validateProductUpdate } from "../validators/adsWebApp.js";
+import {
+  validateProduct,
+  validateProductUpdate,
+} from "../validators/adsWebApp.js";
 
 export const addAdvert = async (req, res, next) => {
   try {
@@ -10,16 +12,17 @@ export const addAdvert = async (req, res, next) => {
         return file.filename;
       }),
     });
+
     if (error) {
       return res.status(422).json(error);
     }
+
     const product = await ProductModel.create({
       ...value,
-      vendor: req.auth.id
+      vendor: req.auth.id,
     });
-    console.log(product)
-    res.status(201).json({ message: "Advert Added" });
 
+    res.status(201).json({ message: "Advert Added", product });
   } catch (error) {
     if (error.code === 11000) {
       return response.status(409).json(error.message);
@@ -28,26 +31,23 @@ export const addAdvert = async (req, res, next) => {
   }
 };
 
-
-
 //Fetch All Adverts
 export const getAllAdverts = async (req, res, next) => {
   try {
-    const { filter = "{}"} = req.query;
-    const result = await ProductModel
-    .find(JSON.parse(filter));
-  
+    const { filter = "{}" } = req.query;
+    const result = await ProductModel.find(JSON.parse(filter));
+
     return res.status(200).json(result);
   } catch (error) {
     next(error);
-    
   }
 };
 
 //Get advert by id
 export const getAdvertById = async (req, res, next) => {
   try {
-    const advert = await ProductModel.findById(req.params.id);
+    const advert = await ProductModel.find({ vendor: req.auth.id });
+
     if (advert) {
       res.status(200).json(advert);
     } else {
@@ -61,30 +61,45 @@ export const getAdvertById = async (req, res, next) => {
 //Update an advert
 export const updateAdvert = async (req, res, next) => {
   try {
-    const { error } = validateProductUpdate.validate(req.body);
+    const { error } = validateProductUpdate.validate({});
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
-    const id = req.params.id
-    const results = await ProductModel.findByIdAndUpdate(id, req.body, { new: true }
-    );
-    if (!results) {
+    const id = req.params.id;
+
+    const result = await ProductModel.findOne({
+      _id: id,
+      vendor: req.auth.id,
+    });
+    if (!result) {
       return res.status(404).json({ message: "Advert not found" });
     }
+
+    const results = await ProductModel.findByIdAndUpdate(result.id, req.body, {
+      new: true,
+    });
+
     res.status(200).json({ results });
   } catch (error) {
     next(error);
   }
 };
 
-
 //Delete an Advert
 export const deleteAdvert = async (req, res, next) => {
   try {
-    const delAd = await ProductModel.findByIdAndDelete(req.params.id);
+    const id = req.params.id;
+    const delAd = await ProductModel.findOne({
+      _id: id,
+      vendor: req.auth.id,
+    });
+
     if (!delAd) {
       return res.status(404).json({ message: "Advert not found" });
     }
+
+    await ProductModel.findByIdAndDelete(delAd.id);
+
     res.json({ message: "Advert removed" });
   } catch (error) {
     next(error);

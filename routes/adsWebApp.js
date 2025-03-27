@@ -16,7 +16,7 @@ export const adsRouter = Router();
 adsRouter.post(
   "/ads",
   isAuthenticated,
-  isAuthorized(["vendor"]),
+  isAuthorized(["vendor", "admin"]),
   adsImageUpload.array("images", 3),
   addAdvert
 );
@@ -25,17 +25,20 @@ adsRouter.post(
 adsRouter.get("/ads", getAllAdverts);
 
 //get an advert
-adsRouter.get("/ads/:id", getAdvertById);
+adsRouter.get("/ad",  isAuthenticated, getAdvertById);
 
 //update an advert
 adsRouter.patch(
-  "/ads/:id",
+  "/ad/:id",
   isAuthenticated,
-  isAuthorized(["vendor"]),
+  isAuthorized(["vendor", "admin"]),
   updateAdvert
 );
 
 //delete an advert
-adsRouter.delete("/ads/:id", isAuthenticated, deleteAdvert);
+adsRouter.delete("/ad/:id", 
+  isAuthenticated, 
+   isAuthorized(["vendor", "admin"]),
+    deleteAdvert);
 
 export default adsRouter;

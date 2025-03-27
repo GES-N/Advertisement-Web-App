@@ -43,40 +43,53 @@ export const registerUser = async (req, res, next) => {
 };
 
 export const loginUser = async (req, res, next) => {
-  const { error, value } = loginUserValidator.validate(req.body);
-  if (error) {
-    return res.status(422).json(error);
-  }
-  const user = await userModel.findOne({ email: value.email });
-  if (user) {
-    console.log(user);
-    const comparePassword = bcrypt.compareSync(value.password, user.password);
-    if (!comparePassword) {
-      return res.status(401).json("Invalid credentials!");
+  try {
+    console.log('ikikokkiokikiiik9ok9ok9ok9ok9o')
+    const { error, value } = loginUserValidator.validate(req.body);
+    if (error) {
+      return res.status(422).json(error);
     }
-    const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "24h",
-    });
-    return res.status(200).json({
-      id: user.id,
-      role: user.role,
-      accessToken,
-    });
-  } else {
-    res.send("user does not exist");
+    console.log('ecfedc', value)
+    const user = await userModel.findOne({ email: value.email });
+    console.log('dwde', user)
+    if (user) {
+      const comparePassword = bcrypt.compareSync(value.password, user.password);
+      if (!comparePassword) {
+        return res.status(401).json("Invalid credentials!");
+      }
+      const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
+        expiresIn: "24h",
+      });
+      console.log('token', accessToken)
+      return res.status(200).json({
+        id: user.id,
+        role: user.role,
+        accessToken,
+      });
+    } else {
+      return res.send("user does not exist");
+    }
+  } catch (error) {
+    next(error)
   }
-};
+}
 
-export const updateUser = async (req, res, next) => {
-  const { error, value } = updateUserValidator.validate(req.body);
-  if (error) {
-    return res.status(422).json(error);
+
+  export const updateUser = async (req, res, next) => {
+    try {
+    const { error, value } = updateUserValidator.validate(req.body);
+    if (error) {
+      return res.status(422).json(error);
+    }
+    const result = await userModel.findByIdAndUpdate(req.params.id, value, {
+      new: true,
+    });
+    res.status(200).json(result);
+} catch (error) {
+  next(error)
+}
   }
-  const result = await userModel.findByIdAndUpdate(req.params.id, value, {
-    new: true,
-  });
-  res.status(200).json(result);
-};
+
 
 export const getAuthenticatedUser = async (req, res, next) => {
   try {
@@ -87,4 +100,5 @@ export const getAuthenticatedUser = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+}
+  
