@@ -2,7 +2,9 @@ import { Router } from "express";
 
 import {
   addAdvert,
+  delAdvert,
   deleteAdvert,
+  getAdvert,
   getAdvertById,
   getAllAdverts,
   updateAdvert,
@@ -24,7 +26,10 @@ adsRouter.post(
 //get all adverts
 adsRouter.get("/ads", getAllAdverts);
 
-//get an advert
+//get a single advert
+adsRouter.get("/ad/:id", getAdvert);
+
+//get adverts for a particular vendor
 adsRouter.get("/ad",  isAuthenticated, getAdvertById);
 
 //update an advert
@@ -35,7 +40,12 @@ adsRouter.patch(
   updateAdvert
 );
 
-//delete an advert
+//delete a single advert
+adsRouter.delete("/ad/:id", isAuthenticated, isAuthorized(["vendor"]), delAdvert)
+
+
+
+//delete an advert related to a vendor
 adsRouter.delete("/ad/:id", 
   isAuthenticated, 
    isAuthorized(["vendor", "admin"]),

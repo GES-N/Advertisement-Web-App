@@ -43,7 +43,7 @@ export const getAllAdverts = async (req, res, next) => {
   }
 };
 
-//Get advert by id
+//Get adverts related to a vendor
 export const getAdvertById = async (req, res, next) => {
   try {
     const advert = await ProductModel.find({ vendor: req.auth.id });
@@ -57,6 +57,21 @@ export const getAdvertById = async (req, res, next) => {
     next(error);
   }
 };
+
+//Get a single product
+export const getAdvert = async (req, res, next) => {
+  try {
+    const advert = await ProductModel.findById(req.params.id);
+    if (advert) {
+      res.status(200).json(advert);
+    } else {
+      res.status(404).json({ message: "Advert not found" });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 //Update an advert
 export const updateAdvert = async (req, res, next) => {
@@ -85,7 +100,19 @@ export const updateAdvert = async (req, res, next) => {
   }
 };
 
-//Delete an Advert
+
+//delete an advert
+export const delAdvert = async (req, res, next) => {
+  const delAd = await ProductModel.findByIdAndDelete({
+    _id: req.params.id,
+  });
+  if (!delAd) {
+    return res.status(404).json({ message: "Advert not found" });
+  }
+  res.json({ message: "Advert removed" });
+};
+
+//Delete an  Advert related to a vendor
 export const deleteAdvert = async (req, res, next) => {
   try {
     const id = req.params.id;
